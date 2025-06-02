@@ -1,20 +1,19 @@
-# Online-marketplace
-A feature-rich online marketplace connecting local businesses with customers through a user-friendly platform, supporting digital storefronts, cart system, discounts, and order tracking.
 # 🛒 LocalMart – Empowering Local Businesses Online
 
-LocalMart is a feature-rich online marketplace designed to help local businesses establish a digital presence. This platform bridges the gap between local sellers and buyers, offering a seamless and interactive shopping experience.
+**LocalMart** is a feature-rich online marketplace built using **Flask (Python)**, designed to empower local businesses with a digital storefront. It connects local sellers with customers through a user-friendly web interface and provides essential tools for managing products, carts, discounts, and purchases.
 
 ---
 
 ## 🚀 Features
 
 - 🔐 User Authentication (Login/Signup)
-- 🛍️ Digital Storefronts for Local Businesses
+- 🛍️ Digital Storefronts for Local Sellers
 - 🛒 Add to Cart & View Cart Functionality
-- 📦 Track Purchased Products
+- 📦 Purchased Products Tracking
 - 💰 Discount Offers and Promotions
-- 🎨 Modern & Responsive UI/UX
-- 🧾 Order History & Customer Dashboard
+- 🎨 Modern & Responsive UI using HTML/CSS/JS
+- 🧾 Order History for Customers
+- ⚙️ Flask-based Backend with Routing & Session Handling
 
 ---
 
@@ -23,13 +22,19 @@ LocalMart is a feature-rich online marketplace designed to help local businesses
 ### 🏠 Homepage  
 ![Homepage](assets/homepage.png)
 
-### 🛒 Cart View  
-![Cart View](assets/cart_view.png)
+### 🏠 Login view 
+![Login view](assets/homepage.png)
+
+### 🏠 Products View 
+![Products View](assets/homepage.png)
+
+### 🛒 Wishlist View 
+![Wishlist View](assets/cart_view.png)
 
 ### 🧑‍💼 Seller Dashboard  
 ![Seller Dashboard](assets/seller_dashboard.png)
 
-> Screenshots are located in the `assets/` folder. Update filenames as needed.
+> All images are stored in the `assets/` folder. Replace filenames as per your actual files.
 
 ---
 
@@ -37,9 +42,10 @@ LocalMart is a feature-rich online marketplace designed to help local businesses
 
 | Layer       | Technology       |
 |-------------|------------------|
-| Frontend    | HTML, CSS, JavaScript / React.js |
-| Backend     | Python (Flask / Django) or Node.js |
-| Database    | MySQL / MongoDB |
+| Frontend    | HTML, CSS, JavaScript |
+| Backend     | Python (Flask Framework) |
+| Database    | SQLite / MySQL |
+| Styling     | Bootstrap (optional) |
 | Versioning  | Git & GitHub |
 
 ---
@@ -48,9 +54,11 @@ LocalMart is a feature-rich online marketplace designed to help local businesses
 
 ```bash
 LocalMart/
-├── frontend/            # User interface files
-├── backend/             # Server-side logic
-├── database/            # DB schemas/config
-├── assets/              # Screenshots and visuals
+├── static/               # CSS, JS, Images
+├── templates/            # HTML templates (Jinja2)
+├── app.py                # Main Flask application           
+├── database/             # DB initialization & models
+├── assets/               # Screenshots for README
+├── requirements.txt      # Python dependencies
 ├── README.md
 └── LICENSE
