@@ -20,7 +20,7 @@
 ## 📸 Screenshots
 
 ### 🏠 Homepage  
-![Homepage](assets/homepage.png)
+![Homepage](assets/Screenshot 2025-06-02 184057.png)
 
 ### 🏠 Login view 
 ![Login view](assets/homepage.png)
