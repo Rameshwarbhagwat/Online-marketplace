@@ -57,8 +57,7 @@ LocalMart/
 ├── static/               # CSS, JS, Images
 ├── templates/            # HTML templates (Jinja2)
 ├── app.py                # Main Flask application           
-├── database/             # DB initialization & models
+├── data/                 # json file
 ├── assets/               # Screenshots for README
-├── requirements.txt      # Python dependencies
 ├── README.md
-└── LICENSE
+└── instance              # database
