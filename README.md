@@ -20,19 +20,17 @@
 ## 📸 Screenshots
 
 ### 🏠 Homepage  
-([ar_electronics/assets/Screenshot 2025-06-02 184246.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png))
+([HOMEPAGE](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png))
 
 ### 🏠 Login view 
-([ar_electronics/assets/Screenshot 2025-06-02 184216.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184216.png))
+([LOGIN VIEW](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184216.png))
 
 ### 🏠 Products View 
-([ar_electronics/assets/Screenshot 2025-06-02 184340.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184320.png))
+([PRODUCTS VIEW](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184320.png))
 
 ### 🛒 Wishlist View 
-([ar_electronics/assets/Screenshot 2025-06-02 184340.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184340.png))
+([WISHLIST VIEW](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184340.png))
 
-### 🧑‍💼 Seller Dashboard  
-[Seller dashboard(https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184320.png)]
 
 > All images are stored in the `assets/` folder. Replace filenames as per your actual files.
 
