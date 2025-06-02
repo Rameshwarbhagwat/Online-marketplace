@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Your Wishlist{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.wishlist-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.wishlist-item {
+    background: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.wishlist-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.wishlist-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.wishlist-info h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.wishlist-info .price {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.wishlist-info .features {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.wishlist-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wishlist-actions .btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.wishlist-actions .btn.small {
+    font-size: 0.8em;
+    padding: 8px 12px;
+}
+
+.wishlist-actions .btn.primary {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+}
+
+.wishlist-actions .btn.primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.wishlist-actions .btn.danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.wishlist-actions .btn.danger:hover {
+    background-color: #a71d2a;
+    transform: translateY(-2px);
+}
+
+.empty-wishlist {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--footer-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-wishlist p {
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.empty-wishlist a {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.empty-wishlist a:hover {
+    background-color: var(--secondary-color);
+}
+</style>
+
+<h1>Your Wishlist</h1>
+
+{% if wishlist %}
+    <div class="wishlist-grid">
+        {% for item in wishlist %}
+        <div class="wishlist-item">
+            <img src="{{ url_for('static', filename='img/' + item.image) }}" alt="{{ item.model }}">
+            <div class="wishlist-info">
+                <h3>{{ item.brand }} {{ item.model }}</h3>
+                <p class="price">₹{{ item.price }}</p>
+                <p class="features">{{ item.features|truncate(50) }}</p>
+                
+                <div class="wishlist-actions">
+                    <a href="{{ url_for('product_detail', category=item.category, brand=item.brand, model=item.model) }}" class="btn small primary">View Details</a>
+                    
+                    <form action="{{ url_for('add_to_cart') }}" method="post">
+                        <input type="hidden" name="category" value="{{ item.category }}">
+                        <input type="hidden" name="brand" value="{{ item.brand }}">
+                        <input type="hidden" name="model" value="{{ item.model }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn small primary">Add to Cart</button>
+                    </form>
+                    
+                    <form action="{{ url_for('remove_from_wishlist') }}" method="post">
+                        <input type="hidden" name="category" value="{{ item.category }}">
+                        <input type="hidden" name="brand" value="{{ item.brand }}">
+                        <input type="hidden" name="model" value="{{ item.model }}">
+                        <button type="submit" class="btn small danger">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-wishlist">
+        <p>Your wishlist is empty.</p>
+        <a href="{{ url_for('all_products') }}" class="btn">Browse Products</a>
+    </div>
+{% endif %}
+{% endblock %}

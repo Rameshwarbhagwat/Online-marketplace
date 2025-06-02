@@ -1,0 +1,10 @@
+{
+    "ram": {
+        "password": "scrypt:32768:8:1$jej2GW5kde6IJrjf$a5196346ba1aedc1667f3417a644f2df336b9db69ab43a518c564f86bb1b73efdf60914e83cf08575ed42bbddf26ba00ed23883a8a0f7a2d83f3f8b4a924e297",
+        "email": "ram@123",
+        "name": "rameshwar bhagwat",
+        "address": "gavandgaon",
+        "joined": "2025-05-04 06:39:28",
+        "role": "user"
+    }
+}

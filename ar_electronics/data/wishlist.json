@@ -1,0 +1,29 @@
+{
+    "ram": [
+        {
+            "category": "laptop",
+            "brand": "HP",
+            "model": "HP Pavilion"
+        },
+        {
+            "category": "laptop",
+            "brand": "HP",
+            "model": ""
+        },
+        {
+            "category": "laptop",
+            "brand": "Dell",
+            "model": ""
+        },
+        {
+            "category": "laptop",
+            "brand": "HP",
+            "model": "HP EliteBook"
+        },
+        {
+            "category": "laptop",
+            "brand": "HP",
+            "model": "HP Spectre"
+        }
+    ]
+}

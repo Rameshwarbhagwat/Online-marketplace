@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+p.results-count {
+    text-align: center;
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.product-card {
+    background: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.product-info h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.product-info .price {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.product-info .features {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-actions .btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.product-actions .btn.primary {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+}
+
+.product-actions .btn.primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.product-actions .btn.secondary {
+    background-color: var(--secondary-color);
+    color: var(--navbar-text);
+}
+
+.product-actions .btn.secondary:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.no-results {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--footer-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-results p {
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.no-results a {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.no-results a:hover {
+    background-color: var(--secondary-color);
+}
+</style>
+
+<h1>Search Results for "{{ query }}"</h1>
+
+{% if results_count > 0 %}
+    <p class="results-count">{{ results_count }} results found</p>
+    
+    <div class="product-grid">
+        {% for product in results %}
+        <div class="product-card">
+            <img src="{{ url_for('static', filename='img/' + product.image) }}" alt="{{ product.model }}">
+            <div class="product-info">
+                <h3>{{ product.brand }} {{ product.model }}</h3>
+                <p class="price">₹{{ product.price }}</p>
+                <p class="features">{{ product.features|truncate(50) }}</p>
+                <div class="product-actions">
+                    <a href="{{ url_for('product_detail', category=product.category, brand=product.brand, model=product.model) }}" class="btn primary">View Details</a>
+                    <form action="{{ url_for('add_to_cart') }}" method="post" class="add-to-cart">
+                        <input type="hidden" name="category" value="{{ product.category }}">
+                        <input type="hidden" name="brand" value="{{ product.brand }}">
+                        <input type="hidden" name="model" value="{{ product.model }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn secondary">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-results">
+        <p>No products found matching your search.</p>
+        <a href="{{ url_for('all_products') }}" class="btn">Browse All Products</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+    "laptop|HP|HP EliteBook": {
+        "category": "laptop",
+        "brand": "HP",
+        "model": "HP EliteBook",
+        "quantity": 1,
+        "price": 80000,
+        "image": "hp_elitebook.jpg"
+    }
+}

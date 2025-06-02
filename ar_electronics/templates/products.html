@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}All Products{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1.page-title {
+    text-align: center;
+    margin: 20px 0;
+    color: var(--text-color);
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Category Section */
+.category-section {
+    margin: 40px 0;
+    padding: 20px;
+    background-color: var(--footer-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-section h2 {
+    text-align: center;
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-transform: capitalize;
+}
+
+/* Horizontal Product Grid */
+.product-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px;
+    scroll-behavior: smooth;
+}
+
+.product-card {
+    flex: 0 0 auto;
+    background: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.product-name {
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.product-price {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.product-features {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--navbar-text);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.scroll-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.scroll-buttons button {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.scroll-buttons button:hover {
+    background-color: var(--secondary-color);
+}
+</style>
+
+<h1 class="page-title">Our Products</h1>
+
+<!-- Dynamic Sections for Each Category -->
+{% for category, brands in categories.items() %}
+<div class="category-section">
+    <h2>{{ category.capitalize() }}</h2>
+    <div class="scroll-buttons">
+        <button onclick="scrollLeft('{{ category }}')">←</button>
+        <button onclick="scrollRight('{{ category }}')">→</button>
+    </div>
+    <div class="product-grid" id="{{ category }}">
+        {% for brand, models in brands.items() %}
+        {% for model, details in models.items() %}
+        <div class="product-card">
+            <img src="{{ url_for('static', filename='img/' + details.image) }}" alt="{{ model }}">
+            <p class="product-name">{{ brand }} {{ model }}</p>
+            <p class="product-price">₹{{ details.price }}</p>
+            <p class="product-features">{{ details.features }}</p>
+            <div class="product-actions">
+                <form action="{{ url_for('add_to_cart') }}" method="post" class="action-form">
+                    <input type="hidden" name="category" value="{{ category }}">
+                    <input type="hidden" name="brand" value="{{ brand }}">
+                    <input type="hidden" name="model" value="{{ model }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </form>
+                <form action="{{ url_for('add_to_wishlist') }}" method="post" class="action-form">
+                    <input type="hidden" name="category" value="{{ category }}">
+                    <input type="hidden" name="brand" value="{{ brand }}">
+                    <input type="hidden" name="model" value="{{ model }}">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-heart"></i> Add to Wishlist
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function scrollLeft(categoryId) {
+    console.log(`Scrolling left for category: ${categoryId}`);
+    const container = document.getElementById(categoryId);
+    if (container) {
+        container.scrollBy({ left: -300, behavior: 'smooth' });
+    } else {
+        console.error(`Element with ID '${categoryId}' not found.`);
+    }
+}
+
+function scrollRight(categoryId) {
+    console.log(`Scrolling right for category: ${categoryId}`);
+    const container = document.getElementById(categoryId);
+    if (container) {
+        container.scrollBy({ left: 300, behavior: 'smooth' });
+    } else {
+        console.error(`Element with ID '${categoryId}' not found.`);
+    }
+}
+</script>
+{% endblock %}

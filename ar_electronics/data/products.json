@@ -1,0 +1,414 @@
+{
+    "laptop": {
+        "HP": {
+            "HP Pavilion": {
+                "price": 70000,
+                "stock": 4,
+                "features": "16GB RAM, 512GB SSD, i7 Processor",
+                "image": "hp_pavilion.jpg"
+            },
+            "HP Envy": {
+                "price": 85000,
+                "stock": 3,
+                "features": "32GB RAM, 1TB SSD, i9 Processor",
+                "image": "hp_envy.jpg"
+            },
+            "HP Spectre": {
+                "price": 95000,
+                "stock": 3,
+                "features": "16GB RAM, 2TB SSD, OLED Display",
+                "image": "hp_spectre.jpg"
+            },
+            "HP Omen": {
+                "price": 90000,
+                "stock": 6,
+                "features": "16GB RAM, 1TB SSD, RTX 3060",
+                "image": "hp_omen.jpg"
+            },
+            "HP EliteBook": {
+                "price": 80000,
+                "stock": 7,
+                "features": "16GB RAM, 512GB SSD, Business Grade",
+                "image": "hp_elitebook.jpg"
+            },
+            "HP Victus": {
+                "price": 75000,
+                "stock": 5,
+                "features": "16GB RAM, 512GB SSD, GTX 1650",
+                "image": "hp_victus.jpg"
+            },
+            "HP ZBook": {
+                "price": 120000,
+                "stock": 2,
+                "features": "32GB RAM, 1TB SSD, Quadro RTX",
+                "image": "hp_zbook.jpg"
+            }
+        },
+        "Dell": {
+            "Dell XPS 13": {
+                "price": 75000,
+                "stock": 5,
+                "features": "8GB RAM, 1TB HDD, i5 Processor",
+                "image": "dell_xps13.jpg"
+            },
+            "Dell Inspiron": {
+                "price": 60000,
+                "stock": 8,
+                "features": "12GB RAM, 512GB SSD, i7 Processor",
+                "image": "dell_inspiron.jpg"
+            },
+            "Dell Alienware": {
+                "price": 120000,
+                "stock": 2,
+                "features": "32GB RAM, 2TB SSD, RTX 3080",
+                "image": "dell_alienware.jpg"
+            },
+            "Dell Latitude": {
+                "price": 70000,
+                "stock": 5,
+                "features": "16GB RAM, 512GB SSD, Business Grade",
+                "image": "dell_latitude.jpg"
+            },
+            "Dell G15": {
+                "price": 80000,
+                "stock": 4,
+                "features": "16GB RAM, 1TB SSD, RTX 3050",
+                "image": "dell_g15.jpg"
+            },
+            "Dell Precision": {
+                "price": 140000,
+                "stock": 3,
+                "features": "32GB RAM, 1TB SSD, Quadro RTX",
+                "image": "dell_precision.jpg"
+            },
+            "Dell Vostro": {
+                "price": 50000,
+                "stock": 6,
+                "features": "8GB RAM, 256GB SSD, i3 Processor",
+                "image": "dell_vostro.jpg"
+            }
+        },
+        "Lenovo": {
+            "Lenovo ThinkPad": {
+                "price": 65000,
+                "stock": 6,
+                "features": "12GB RAM, 512GB SSD, Ryzen 5",
+                "image": "lenovo_thinkpad.jpg"
+            },
+            "Lenovo Legion": {
+                "price": 90000,
+                "stock": 3,
+                "features": "32GB RAM, 1TB SSD, RTX 3070",
+                "image": "lenovo_legion.jpg"
+            },
+            "Lenovo Yoga": {
+                "price": 75000,
+                "stock": 5,
+                "features": "16GB RAM, 1TB SSD, 2-in-1 Convertible",
+                "image": "lenovo_yoga.jpg"
+            },
+            "Lenovo IdeaPad": {
+                "price": 50000,
+                "stock": 7,
+                "features": "8GB RAM, 512GB SSD, i5 Processor",
+                "image": "lenovo_ideapad.jpg"
+            },
+            "Lenovo Flex": {
+                "price": 60000,
+                "stock": 6,
+                "features": "12GB RAM, 512GB SSD, Touchscreen",
+                "image": "lenovo_flex.jpg"
+            },
+            "Lenovo Slim 7i": {
+                "price": 85000,
+                "stock": 4,
+                "features": "16GB RAM, 1TB SSD, i7 Processor",
+                "image": "lenovo_slim7i.jpg"
+            }
+        },
+        "Asus": {
+            "Asus ROG Zephyrus": {
+                "price": 120000,
+                "stock": 2,
+                "features": "32GB RAM, 1TB SSD, RTX 3080",
+                "image": "asus_rog_zephyrus.jpg"
+            },
+            "Asus VivoBook": {
+                "price": 55000,
+                "stock": 10,
+                "features": "8GB RAM, 512GB SSD, i5 Processor",
+                "image": "asus_vivobook.jpg"
+            },
+            "Asus TUF Gaming": {
+                "price": 80000,
+                "stock": 4,
+                "features": "16GB RAM, 1TB SSD, RTX 3060",
+                "image": "asus_tuf_gaming.jpg"
+            },
+            "Asus ZenBook": {
+                "price": 85000,
+                "stock": 3,
+                "features": "16GB RAM, 1TB SSD, OLED Display",
+                "image": "asus_zenbook.jpg"
+            },
+            "Asus Chromebook": {
+                "price": 40000,
+                "stock": 10,
+                "features": "8GB RAM, 128GB SSD, Chrome OS",
+                "image": "asus_chromebook.jpg"
+            },
+            "Asus ExpertBook": {
+                "price": 70000,
+                "stock": 5,
+                "features": "16GB RAM, 512GB SSD, Business Grade",
+                "image": "asus_expertbook.jpg"
+            }
+        }
+    },
+    "smartphone": {
+        "Samsung": {
+            "Samsung Galaxy S22": {
+                "price": 15000,
+                "stock": 10,
+                "features": "6GB RAM, 128GB Storage, 50MP Camera",
+                "image": "samsung_s22.jpg"
+            },
+            "Samsung Galaxy Z Fold": {
+                "price": 120000,
+                "stock": 2,
+                "features": "12GB RAM, 512GB Storage, Foldable Display",
+                "image": "samsung_zfold.jpg"
+            },
+            "Samsung Galaxy A52": {
+                "price": 25000,
+                "stock": 8,
+                "features": "8GB RAM, 128GB Storage, 64MP Camera",
+                "image": "samsung_a52.jpg"
+            },
+            "Samsung Galaxy Note 20": {
+                "price": 60000,
+                "stock": 3,
+                "features": "12GB RAM, 256GB Storage, S Pen",
+                "image": "samsung_note20.jpg"
+            },
+            "Samsung Galaxy S21 FE": {
+                "price": 40000,
+                "stock": 5,
+                "features": "8GB RAM, 128GB Storage, 120Hz Display",
+                "image": "samsung_s21_fe.jpg"
+            }
+        },
+        "Apple": {
+            "iPhone 13": {
+                "price": 80000,
+                "stock": 5,
+                "features": "A15 Bionic Chip, 256GB Storage, 12MP Camera",
+                "image": "iphone_13.jpg"
+            },
+            "iPhone 14 Pro": {
+                "price": 120000,
+                "stock": 3,
+                "features": "A16 Bionic Chip, 512GB Storage, Dynamic Island",
+                "image": "iphone_14_pro.jpg"
+            },
+            "iPhone SE": {
+                "price": 40000,
+                "stock": 6,
+                "features": "A15 Bionic Chip, 64GB Storage, Compact Design",
+                "image": "iphone_se.jpg"
+            },
+            "iPhone 12": {
+                "price": 60000,
+                "stock": 4,
+                "features": "A14 Bionic Chip, 128GB Storage, 5G Support",
+                "image": "iphone_12.jpg"
+            },
+            "iPhone 14": {
+                "price": 90000,
+                "stock": 3,
+                "features": "A15 Bionic Chip, 256GB Storage, 12MP Camera",
+                "image": "iphone_14.jpg"
+            }
+        }
+    },
+    "watch": {
+        "Fossil": {
+            "Fossil Gen 6": {
+                "price": 15000,
+                "stock": 10,
+                "features": "Smartwatch, Heart Rate Monitor, GPS",
+                "image": "fossil_gen6.jpg"
+            },
+            "Fossil Hybrid HR": {
+                "price": 12000,
+                "stock": 8,
+                "features": "Hybrid Smartwatch, E-Ink Display",
+                "image": "fossil_hybrid_hr.jpg"
+            }
+        },
+        "Apple": {
+            "Apple Watch Series 8": {
+                "price": 30000,
+                "stock": 5,
+                "features": "Smartwatch, ECG, Fitness Tracking",
+                "image": "apple_watch_series8.jpg"
+            },
+            "Apple Watch SE": {
+                "price": 25000,
+                "stock": 7,
+                "features": "Smartwatch, Heart Rate Monitor, GPS",
+                "image": "apple_watch_se.jpg"
+            }
+        }
+    },
+    "tablet": {
+        "Apple": {
+            "iPad Pro": {
+                "price": 80000,
+                "stock": 5,
+                "features": "12.9-inch Retina Display, M1 Chip",
+                "image": "ipad_pro.jpg"
+            },
+            "iPad Air": {
+                "price": 60000,
+                "stock": 7,
+                "features": "10.9-inch Display, A14 Bionic Chip",
+                "image": "ipad_air.jpg"
+            }
+        },
+        "Samsung": {
+            "Samsung Galaxy Tab S8": {
+                "price": 70000,
+                "stock": 6,
+                "features": "11-inch Display, Snapdragon Processor",
+                "image": "samsung_tab_s8.jpg"
+            },
+            "Samsung Galaxy Tab A8": {
+                "price": 20000,
+                "stock": 10,
+                "features": "10.5-inch Display, 4GB RAM",
+                "image": "samsung_tab_a8.jpg"
+            }
+        }
+    },
+    "headphones": {
+        "Sony": {
+            "Sony WH-1000XM4": {
+                "price": 30000,
+                "stock": 8,
+                "features": "Noise Cancelling, Wireless",
+                "image": "sony_wh1000xm4.jpg"
+            },
+            "Sony WF-1000XM4": {
+                "price": 20000,
+                "stock": 10,
+                "features": "Noise Cancelling, True Wireless",
+                "image": "sony_wf1000xm4.jpg"
+            }
+        },
+        "Bose": {
+            "Bose QuietComfort 45": {
+                "price": 35000,
+                "stock": 5,
+                "features": "Noise Cancelling, Wireless",
+                "image": "bose_qc45.jpg"
+            },
+            "Bose Sport Earbuds": {
+                "price": 15000,
+                "stock": 12,
+                "features": "Wireless, Sweat Resistant",
+                "image": "bose_sport_earbuds.jpg"
+            }
+        }
+    },
+    "smart TV": {
+        "Samsung": {
+            "Samsung QLED Q80A": {
+                "price": 60000,
+                "stock": 4,
+                "features": "4K UHD, Smart Features",
+                "image": "samsung_qled_q80a.jpg"
+            },
+            "Samsung Crystal UHD AU8000": {
+                "price": 50000,
+                "stock": 6,
+                "features": "4K UHD, HDR",
+                "image": "samsung_crystal_uhd_au8000.jpg"
+            }
+        },
+        "LG": {
+            "LG OLED C1": {
+                "price": 70000,
+                "stock": 3,
+                "features": "OLED Display, Dolby Vision",
+                "image": "lg_oled_c1.jpg"
+            },
+            "LG NanoCell 75": {
+                "price": 55000,
+                "stock": 5,
+                "features": "4K UHD, NanoCell Technology",
+                "image": "lg_nanocell_75.jpg"
+            }
+        }
+    },
+    "camera": {
+        "Canon": {
+            "Canon EOS R5": {
+                "price": 300000,
+                "stock": 2,
+                "features": "45MP, 8K Video Recording",
+                "image": "canon_eos_r5.jpg"
+            },
+            "Canon EOS 90D": {
+                "price": 120000,
+                "stock": 4,
+                "features": "32MP, 4K Video Recording",
+                "image": "canon_eos_90d.jpg"
+            }
+        },
+        "Sony": {
+            "Sony Alpha 7 IV": {
+                "price": 250000,
+                "stock": 3,
+                "features": "33MP, 4K Video, Mirrorless",
+                "image": "sony_alpha_7_iv.jpg"
+            },
+            "Sony ZV-1": {
+                "price": 70000,
+                "stock": 6,
+                "features": "20MP, 4K Video, Vlogging",
+                "image": "sony_zv1.jpg"
+            }
+        }
+    },
+    "power bank": {
+        "Mi": {
+            "Mi Power Bank 3i": {
+                "price": 1500,
+                "stock": 20,
+                "features": "10000mAh, Fast Charging",
+                "image": "mi_power_bank_3i.jpg"
+            },
+            "Mi Power Bank Pro": {
+                "price": 2500,
+                "stock": 15,
+                "features": "20000mAh, USB-C PD",
+                "image": "mi_power_bank_pro.jpg"
+            }
+        },
+        "Anker": {
+            "Anker PowerCore 10000": {
+                "price": 3000,
+                "stock": 10,
+                "features": "10000mAh, Compact Design",
+                "image": "anker_powercore_10000.jpg"
+            },
+            "Anker PowerCore Slim": {
+                "price": 3500,
+                "stock": 8,
+                "features": "20000mAh, Slim Design",
+                "image": "anker_powercore_slim.jpg"
+            }
+        }
+    }
+}

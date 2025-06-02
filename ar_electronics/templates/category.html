@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category }}{% endblock %}
+
+{% block content %}
+<h1>{{ category }}</h1>
+
+<div class="brand-grid">
+    {% for brand, models in brands.items() %}
+    <div class="brand-card">
+        <h2>{{ brand }}</h2>
+        <div class="brand-models">
+            {% for model, details in models.items() %}
+            <div class="model-item">
+                <a href="{{ url_for('product_detail', category=category.lower(), brand=brand.lower(), model=model) }}">
+                    {{ model }} - ₹{{ details.price }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('brand_products', category=category.lower(), brand=brand.lower()) }}" class="btn">View All {{ brand }} Products</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

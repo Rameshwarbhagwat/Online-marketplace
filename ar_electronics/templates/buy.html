@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Buy Now{% endblock %}
+
+{% block content %}
+<style>
+/* Buy Page Styling */
+.buy-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+}
+
+.buy-container h1 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+textarea {
+    resize: none;
+    height: 100px;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+</style>
+
+<div class="buy-container">
+    <h1>Buy Now</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="shipping_address">Shipping Address</label>
+            <textarea id="shipping_address" name="shipping_address">{{ user.address }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="payment_method">Payment Method</label>
+            <select id="payment_method" name="payment_method">
+                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="UPI">UPI</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Confirm Purchase</button>
+    </form>
+</div>
+{% endblock %}

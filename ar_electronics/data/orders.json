@@ -1,0 +1,152 @@
+{
+    "ram": [
+        {
+            "date": "2025-05-04 07:43:06",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "Dell",
+                    "model": "Dell XPS 13",
+                    "quantity": 1,
+                    "price": 75000
+                },
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Pavilion",
+                    "quantity": 1,
+                    "price": 70000
+                }
+            ],
+            "total": 145000,
+            "shipping": "gavandgaon",
+            "payment": "credit_card",
+            "status": "processing"
+        },
+        {
+            "date": "2025-05-04 16:01:56",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Envy",
+                    "quantity": 1,
+                    "price": 85000
+                }
+            ],
+            "total": 85000,
+            "shipping": "gavandgaon",
+            "payment": "credit_card",
+            "status": "processing"
+        },
+        {
+            "date": "2025-05-04 18:12:10",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Envy",
+                    "quantity": 1,
+                    "price": 85000,
+                    "image": "hp_envy.jpg"
+                },
+                {
+                    "category": "smartphone",
+                    "brand": "Samsung",
+                    "model": "Samsung Galaxy A52",
+                    "quantity": 1,
+                    "price": 25000,
+                    "image": "samsung_a52.jpg"
+                },
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Spectre",
+                    "quantity": 3,
+                    "price": 95000,
+                    "image": "hp_spectre.jpg"
+                }
+            ],
+            "total": 395000,
+            "payment": "Cash on Delivery",
+            "shipping": "gavandgaon",
+            "status": "Completed"
+        },
+        {
+            "date": "2025-05-04 18:25:07",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Spectre",
+                    "quantity": 1,
+                    "price": 95000,
+                    "image": "hp_spectre.jpg"
+                }
+            ],
+            "total": 95000,
+            "payment": "Cash on Delivery",
+            "shipping": "gavandgaon",
+            "status": "Completed"
+        },
+        {
+            "date": "2025-05-04 18:36:40",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Spectre",
+                    "quantity": 1,
+                    "price": 95000,
+                    "image": "hp_spectre.jpg"
+                }
+            ],
+            "total": 95000,
+            "payment": "Cash on Delivery",
+            "shipping": "gavandgaon",
+            "status": "Completed"
+        },
+        {
+            "date": "2025-05-04 18:49:34",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP Spectre",
+                    "quantity": 1,
+                    "price": 95000,
+                    "image": "hp_spectre.jpg"
+                },
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP EliteBook",
+                    "quantity": 1,
+                    "price": 80000,
+                    "image": "hp_elitebook.jpg"
+                }
+            ],
+            "total": 175000,
+            "payment": "Cash on Delivery",
+            "shipping": "gavandgaon",
+            "status": "Completed"
+        },
+        {
+            "date": "2025-05-04 18:59:41",
+            "items": [
+                {
+                    "category": "laptop",
+                    "brand": "HP",
+                    "model": "HP EliteBook",
+                    "quantity": 1,
+                    "price": 80000,
+                    "image": "hp_elitebook.jpg"
+                }
+            ],
+            "total": 80000,
+            "payment": "Cash on Delivery",
+            "shipping": "gavandgaon",
+            "status": "Completed"
+        }
+    ]
+}

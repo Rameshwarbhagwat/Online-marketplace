@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+.order-confirmation {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.order-confirmation h1 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.confirmation-message {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.confirmation-message i {
+    font-size: 3em;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.confirmation-message h2 {
+    font-size: 1.8em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.confirmation-message p {
+    font-size: 1.2em;
+    color: var(--text-color);
+}
+
+.order-summary {
+    margin-bottom: 30px;
+}
+
+.order-summary h3 {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.order-details {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.order-details p {
+    font-size: 1.2em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+    margin: 10px 0;
+}
+
+.order-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.order-items th, .order-items td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.order-items th {
+    background-color: var(--footer-bg);
+    color: var(--navbar-text);
+    text-transform: uppercase;
+}
+
+.order-items td {
+    color: var(--text-color);
+}
+
+.order-items tfoot td {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: var(--text-color);
+}
+
+.order-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.order-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.order-actions .btn {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+}
+
+.order-actions .btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.order-actions .btn.secondary {
+    background-color: var(--secondary-color);
+    color: var(--navbar-text);
+}
+
+.order-actions .btn.secondary:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+</style>
+
+<div class="order-confirmation">
+    <h1>Thank You for Your Purchase!</h1>
+    <p>Your order has been placed successfully.</p>
+
+    <div class="order-details">
+        <p><strong>Order Date:</strong> {{ order.date }}</p>
+        <p><strong>Total:</strong> ₹{{ order.total }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment }}</p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping }}</p>
+    </div>
+
+    <a href="{{ url_for('order_history') }}" class="btn primary">View Order History</a>
+</div>
+{% endblock %}

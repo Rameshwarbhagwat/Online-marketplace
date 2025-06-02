@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.profile-photo {
+    flex: 1;
+    max-width: 200px;
+    text-align: center;
+}
+
+.profile-photo img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    border: 3px solid var(--primary-color);
+}
+
+.profile-photo button {
+    display: block;
+    margin: 10px auto;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.profile-photo button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.profile-details {
+    flex: 2;
+}
+
+.profile-header {
+    margin-bottom: 20px;
+}
+
+.profile-header h1 {
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background-color: var(--footer-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card h3 {
+    font-size: 1.5em;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    font-size: 1em;
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+textarea {
+    resize: none;
+    height: 100px;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.change-password {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 10px;
+    background-color: var(--footer-bg);
+}
+</style>
+
+<div class="profile-container">
+    <!-- Profile Photo Section -->
+    <div class="profile-photo">
+        <img src="{{ url_for('static', filename='img/profile_placeholder.png') }}" alt="Profile Photo">
+        <form action="{{ url_for('upload_profile_photo') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="profile_photo" accept="image/*" required>
+            <button type="submit">Upload Photo</button>
+        </form>
+    </div>
+    
+    <!-- Profile Details Section -->
+    <div class="profile-details">
+        <div class="profile-header">
+            <h1>Your Profile</h1>
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <h3>{{ order_count }}</h3>
+                    <p>Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ wishlist_count }}</h3>
+                    <p>Wishlist Items</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2>Account Information</h2>
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="{{ user.username }}" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address">{{ user.address }}</textarea>
+            </div>
+            
+            <button type="submit" class="btn">Update Profile</button>
+        </form>
+        
+        <div class="change-password">
+            <h2>Change Password</h2>
+            <form method="POST" action="{{ url_for('change_password') }}">
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+                
+                <button type="submit" class="btn">Change Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

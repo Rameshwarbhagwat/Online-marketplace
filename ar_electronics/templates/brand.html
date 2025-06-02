@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}{{ brand }} {{ category }}{% endblock %}
+
+{% block content %}
+<style>
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    color: var(--primary-color);
+    font-size: 2.5em;
+    text-transform: capitalize;
+}
+
+/* Product Grid */
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.product-card {
+    background: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.product-info h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.product-info .price {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.product-info .features {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--navbar-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--navbar-text);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+    background-color: #ff6f61;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.wishlist-btn:hover {
+    background-color: #e0554a;
+    transform: translateY(-2px);
+}
+</style>
+
+<h1>{{ brand }} {{ category }}</h1>
+
+<div class="product-grid">
+    {% for model, details in models.items() %}
+    <div class="product-card">
+        <img src="{{ url_for('static', filename='img/' + details.image) }}" alt="{{ model }}">
+        <div class="product-info">
+            <h3>{{ model }}</h3>
+            <p class="price">₹{{ details.price }}</p>
+            <p class="features">{{ details.features|truncate(50) }}</p>
+            <div class="product-actions">
+                <a href="{{ url_for('product_detail', category=category.lower(), brand=brand.lower(), model=model) }}" class="btn btn-primary">View Details</a>
+                <form action="{{ url_for('add_to_cart') }}" method="post" class="add-to-cart">
+                    <input type="hidden" name="category" value="{{ category.lower() }}">
+                    <input type="hidden" name="brand" value="{{ brand.lower() }}">
+                    <input type="hidden" name="model" value="{{ model }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                </form>
+                <form action="{{ url_for('add_to_wishlist') }}" method="post" class="add-to-wishlist">
+                    <input type="hidden" name="category" value="{{ category.lower() }}">
+                    <input type="hidden" name="brand" value="{{ brand.lower() }}">
+                    <input type="hidden" name="model" value="{{ model }}">
+                    <button type="submit" class="btn wishlist-btn">Add to Wishlist</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,1096 @@
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+import json
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # Change this in production
+
+# Configuration
+app.config['DATA_DIR'] = 'data'
+app.config['USER_DATA_FILE'] = os.path.join(app.config['DATA_DIR'], "users.json")
+app.config['WISHLIST_FILE'] = os.path.join(app.config['DATA_DIR'], "wishlist.json")
+app.config['ORDERS_FILE'] = os.path.join(app.config['DATA_DIR'], "orders.json")
+app.config['REVIEWS_FILE'] = os.path.join(app.config['DATA_DIR'], "reviews.json")
+app.config['PRODUCTS_FILE'] = os.path.join(app.config['DATA_DIR'], "products.json")
+app.config['STATIC_IMG'] = 'static/img'
+
+# Create data directory if it doesn't exist
+os.makedirs(app.config['DATA_DIR'], exist_ok=True)
+
+
+# Helper functions
+def load_data(file_name):
+    if os.path.exists(file_name):
+        with open(file_name, "r") as file:
+            try:
+                return json.load(file)
+            except json.JSONDecodeError:
+                return {}
+    return {}
+
+def save_data(file_name, data):
+    with open(file_name, "w") as file:
+        json.dump(data, file, indent=4)
+
+def initialize_default_products():
+    default_products = {
+    "laptop": {
+        "HP": {
+            "HP Pavilion": {"price": 70000, "stock": 5, "features": "16GB RAM, 512GB SSD, i7 Processor"},
+            "HP Envy": {"price": 85000, "stock": 4, "features": "32GB RAM, 1TB SSD, i9 Processor"},
+            "HP Spectre": {"price": 95000, "stock": 3, "features": "16GB RAM, 2TB SSD, OLED Display"},
+            "HP Omen": {"price": 90000, "stock": 6, "features": "16GB RAM, 1TB SSD, RTX 3060"},
+            "HP EliteBook": {"price": 80000, "stock": 7, "features": "16GB RAM, 512GB SSD, Business Grade"}
+        },
+        "Dell": {
+            "Dell XPS 13": {"price": 75000, "stock": 6, "features": "8GB RAM, 1TB HDD, i5 Processor"},
+            "Dell Inspiron": {"price": 60000, "stock": 8, "features": "12GB RAM, 512GB SSD, i7 Processor"},
+            "Dell Alienware": {"price": 120000, "stock": 2, "features": "32GB RAM, 2TB SSD, RTX 3080"},
+            "Dell Latitude": {"price": 70000, "stock": 5, "features": "16GB RAM, 512GB SSD, Business Grade"},
+            "Dell G15": {"price": 80000, "stock": 4, "features": "16GB RAM, 1TB SSD, RTX 3050"}
+        },
+        "Lenovo": {
+            "Lenovo ThinkPad": {"price": 65000, "stock": 4, "features": "12GB RAM, 512GB SSD, Ryzen 5"},
+            "Lenovo Yoga": {"price": 75000, "stock": 5, "features": "16GB RAM, 1TB SSD, 2-in-1 Convertible"},
+            "Lenovo Legion": {"price": 90000, "stock": 3, "features": "32GB RAM, 1TB SSD, RTX 3070"},
+            "Lenovo IdeaPad": {"price": 50000, "stock": 7, "features": "8GB RAM, 512GB SSD, i5 Processor"},
+            "Lenovo Flex": {"price": 60000, "stock": 6, "features": "12GB RAM, 512GB SSD, Touchscreen"}
+        },
+        "Asus": {
+            "Asus ROG Zephyrus": {"price": 72000, "stock": 5, "features": "16GB RAM, 1TB SSD, Ryzen 7"},
+            "Asus VivoBook": {"price": 55000, "stock": 8, "features": "8GB RAM, 512GB SSD, i5 Processor"},
+            "Asus TUF Gaming": {"price": 80000, "stock": 4, "features": "16GB RAM, 1TB SSD, RTX 3060"},
+            "Asus ZenBook": {"price": 85000, "stock": 3, "features": "16GB RAM, 1TB SSD, OLED Display"},
+            "Asus Chromebook": {"price": 40000, "stock": 10, "features": "8GB RAM, 128GB SSD, Chrome OS"}
+        },
+        "Acer": {
+            "Acer Aspire": {"price": 60000, "stock": 7, "features": "8GB RAM, 512GB SSD, i5 Processor"},
+            "Acer Predator": {"price": 95000, "stock": 3, "features": "32GB RAM, 1TB SSD, RTX 3070"},
+            "Acer Swift": {"price": 65000, "stock": 6, "features": "12GB RAM, 512GB SSD, i7 Processor"},
+            "Acer Nitro": {"price": 70000, "stock": 5, "features": "16GB RAM, 1TB SSD, RTX 3050"},
+            "Acer Spin": {"price": 55000, "stock": 8, "features": "8GB RAM, 512GB SSD, 2-in-1 Convertible"}
+        },
+        "Apple": {
+            "MacBook Air": {"price": 120000, "stock": 3, "features": "MacBook Pro, M1 Chip, 512GB SSD"},
+            "MacBook Pro 13-inch": {"price": 140000, "stock": 2, "features": "16GB RAM, 1TB SSD, M1 Pro"},
+            "MacBook Pro 16-inch": {"price": 180000, "stock": 1, "features": "32GB RAM, 2TB SSD, M1 Max"},
+            "MacBook Air M2": {"price": 130000, "stock": 4, "features": "8GB RAM, 512GB SSD, M2 Chip"},
+            "Mac Mini": {"price": 80000, "stock": 5, "features": "8GB RAM, 256GB SSD, M1 Chip"}
+        },
+        "Samsung": {
+            "Samsung Galaxy Book": {"price": 78000, "stock": 3, "features": "16GB RAM, 512GB SSD, AMOLED Display"},
+            "Samsung Notebook 9": {"price": 70000, "stock": 4, "features": "12GB RAM, 512GB SSD, i7 Processor"},
+            "Samsung Odyssey": {"price": 90000, "stock": 2, "features": "16GB RAM, 1TB SSD, RTX 3060"},
+            "Samsung Chromebook": {"price": 40000, "stock": 6, "features": "8GB RAM, 128GB SSD, Chrome OS"},
+            "Samsung Flex": {"price": 75000, "stock": 3, "features": "12GB RAM, 512GB SSD, 2-in-1 Convertible"}
+        }
+    },
+    "smartphone": {
+        "Samsung": {
+            "Samsung Galaxy S22": {"price": 15000, "stock": 10, "features": "6GB RAM, 128GB Storage, 50MP Camera"},
+            "Samsung Galaxy Z Fold": {"price": 120000, "stock": 2, "features": "12GB RAM, 512GB Storage, Foldable Display"},
+            "Samsung Galaxy A52": {"price": 25000, "stock": 8, "features": "8GB RAM, 128GB Storage, 64MP Camera"},
+            "Samsung Galaxy Note 20": {"price": 60000, "stock": 3, "features": "12GB RAM, 256GB Storage, S Pen"},
+            "Samsung Galaxy S21 FE": {"price": 40000, "stock": 5, "features": "8GB RAM, 128GB Storage, 120Hz Display"}
+        },
+        "Apple": {
+            "iPhone 13": {"price": 80000, "stock": 3, "features": "A15 Bionic Chip, 256GB Storage, 12MP Camera"},
+            "iPhone 14 Pro": {"price": 120000, "stock": 2, "features": "A16 Bionic Chip, 512GB Storage, Dynamic Island"},
+            "iPhone SE": {"price": 40000, "stock": 6, "features": "A15 Bionic Chip, 64GB Storage, Compact Design"},
+            "iPhone 12": {"price": 60000, "stock": 4, "features": "A14 Bionic Chip, 128GB Storage, 5G Support"},
+            "iPhone 14": {"price": 90000, "stock": 3, "features": "A15 Bionic Chip, 256GB Storage, 12MP Camera"}
+        },
+        "OnePlus": {
+            "OnePlus 10 Pro": {"price": 40000, "stock": 5, "features": "8GB RAM, 128GB Storage, 64MP Camera"},
+            "OnePlus 9R": {"price": 35000, "stock": 7, "features": "8GB RAM, 128GB Storage, 120Hz Display"},
+            "OnePlus Nord CE": {"price": 25000, "stock": 9, "features": "6GB RAM, 128GB Storage, 64MP Camera"},
+            "OnePlus 8T": {"price": 30000, "stock": 6, "features": "8GB RAM, 128GB Storage, 120Hz Display"},
+            "OnePlus Nord 2": {"price": 28000, "stock": 8, "features": "8GB RAM, 128GB Storage, 50MP Camera"}
+        },
+        "Realme": {
+            "Realme GT Neo 3": {"price": 17000, "stock": 10, "features": "6GB RAM, 128GB Storage, 64MP Camera"},
+            "Realme 9 Pro": {"price": 20000, "stock": 8, "features": "8GB RAM, 128GB Storage, 120Hz Display"},
+            "Realme Narzo 50": {"price": 15000, "stock": 12, "features": "6GB RAM, 128GB Storage, 50MP Camera"},
+            "Realme 8": {"price": 18000, "stock": 9, "features": "6GB RAM, 128GB Storage, 64MP Camera"},
+            "Realme X7 Max": {"price": 22000, "stock": 7, "features": "8GB RAM, 128GB Storage, 120Hz Display"}
+        },
+        "Vivo": {
+            "Vivo V25 Pro": {"price": 20000, "stock": 8, "features": "8GB RAM, 256GB Storage, 50MP Selfie Camera"},
+            "Vivo X80": {"price": 50000, "stock": 3, "features": "12GB RAM, 256GB Storage, 50MP Camera"},
+            "Vivo Y21": {"price": 15000, "stock": 10, "features": "6GB RAM, 128GB Storage, 13MP Camera"},
+            "Vivo T1": {"price": 18000, "stock": 7, "features": "8GB RAM, 128GB Storage, 50MP Camera"},
+            "Vivo X70 Pro": {"price": 45000, "stock": 4, "features": "12GB RAM, 256GB Storage, Gimbal Camera"}
+        },
+        "Oppo": {
+            "Oppo Reno 8": {"price": 22000, "stock": 9, "features": "8GB RAM, 128GB Storage, 64MP AI Camera"},
+            "Oppo Find X5": {"price": 60000, "stock": 2, "features": "12GB RAM, 256GB Storage, 50MP Camera"},
+            "Oppo A76": {"price": 18000, "stock": 8, "features": "6GB RAM, 128GB Storage, 13MP Camera"},
+            "Oppo F21 Pro": {"price": 25000, "stock": 6, "features": "8GB RAM, 128GB Storage, 64MP Camera"},
+            "Oppo Reno 7": {"price": 28000, "stock": 5, "features": "8GB RAM, 128GB Storage, 50MP Camera"}
+        },
+        "Google": {
+            "Pixel 7": {"price": 60000, "stock": 4, "features": "Pixel 7, Tensor Chip, 50MP Camera"},
+            "Pixel 6a": {"price": 40000, "stock": 6, "features": "6GB RAM, 128GB Storage, 12MP Camera"},
+            "Pixel 7 Pro": {"price": 80000, "stock": 3, "features": "12GB RAM, 256GB Storage, 50MP Camera"},
+            "Pixel 5": {"price": 50000, "stock": 5, "features": "8GB RAM, 128GB Storage, 12MP Camera"},
+            "Pixel 4a": {"price": 35000, "stock": 7, "features": "6GB RAM, 128GB Storage, 12MP Camera"}
+        }
+    },
+    "watch": {
+        "Fossil": {
+            "Fossil Gen 6": {"price": 5000, "stock": 8, "features": "Analog, Waterproof, Leather Strap"},
+            "Fossil Sport": {"price": 6000, "stock": 7, "features": "Smartwatch, Heart Rate Monitor, GPS"},
+            "Fossil Carlyle": {"price": 7000, "stock": 5, "features": "Smartwatch, NFC, Wear OS"},
+            "Fossil Hybrid HR": {"price": 8000, "stock": 4, "features": "E-Ink Display, Heart Rate Monitor"},
+            "Fossil Collider": {"price": 5500, "stock": 6, "features": "Hybrid Smartwatch, Notifications"}
+        },
+        "Apple": {
+            "Apple Watch Series 8": {"price": 30000, "stock": 5, "features": "Smartwatch, ECG, Fitness Tracking"},
+            "Apple Watch SE": {"price": 25000, "stock": 7, "features": "Smartwatch, Heart Rate Monitor, GPS"},
+            "Apple Watch Ultra": {"price": 50000, "stock": 2, "features": "Rugged Design, Dive Capabilities"},
+            "Apple Watch Series 7": {"price": 28000, "stock": 4, "features": "Smartwatch, Blood Oxygen Monitor"},
+            "Apple Watch Series 3": {"price": 15000, "stock": 9, "features": "Basic Smartwatch, Fitness Tracking"}
+        },
+        "Samsung": {
+            "Samsung Galaxy Watch 5": {"price": 10000, "stock": 6, "features": "Smartwatch, Heart Rate Monitor, GPS"},
+            "Samsung Galaxy Watch 4": {"price": 8000, "stock": 8, "features": "Smartwatch, ECG, Wear OS"},
+            "Samsung Galaxy Watch Active 2": {"price": 7000, "stock": 7, "features": "Smartwatch, Fitness Tracking"},
+            "Samsung Galaxy Watch 3": {"price": 9000, "stock": 5, "features": "Smartwatch, Rotating Bezel"},
+            "Samsung Galaxy Fit 2": {"price": 3000, "stock": 10, "features": "Fitness Tracker, Heart Rate Monitor"}
+        },
+        "Garmin": {
+            "Garmin Venu 2": {"price": 15000, "stock": 4, "features": "GPS, Fitness Tracker, AMOLED Display"},
+            "Garmin Forerunner 245": {"price": 12000, "stock": 6, "features": "GPS, Running Dynamics"},
+            "Garmin Fenix 6": {"price": 25000, "stock": 3, "features": "GPS, Multi-Sport Tracking"},
+            "Garmin Instinct": {"price": 10000, "stock": 5, "features": "Rugged Design, GPS, Heart Rate Monitor"},
+            "Garmin Lily": {"price": 8000, "stock": 7, "features": "Fitness Tracker, Stylish Design"}
+        },
+        "Fitbit": {
+            "Fitbit Versa 3": {"price": 12000, "stock": 7, "features": "Activity Tracker, Sleep Monitoring"},
+            "Fitbit Charge 5": {"price": 10000, "stock": 9, "features": "Fitness Tracker, ECG, GPS"},
+            "Fitbit Sense": {"price": 15000, "stock": 4, "features": "Smartwatch, Stress Management"},
+            "Fitbit Inspire 2": {"price": 6000, "stock": 12, "features": "Basic Fitness Tracker, Heart Rate Monitor"},
+            "Fitbit Luxe": {"price": 8000, "stock": 8, "features": "Fitness Tracker, Stylish Design"}
+        }
+    },
+    "tablet": {
+        "Apple": {
+            "iPad Pro": {"price": 25000, "stock": 8, "features": "10.2-inch Retina Display, A13 Bionic Chip"},
+            "iPad Air": {"price": 30000, "stock": 6, "features": "10.9-inch Display, M1 Chip"},
+            "iPad Mini": {"price": 20000, "stock": 7, "features": "8.3-inch Display, A15 Bionic Chip"},
+            "iPad 10.2": {"price": 22000, "stock": 9, "features": "10.2-inch Display, A12 Bionic Chip"},
+            "iPad 9th Gen": {"price": 18000, "stock": 10, "features": "10.2-inch Display, A13 Bionic Chip"}
+        },
+        "Samsung": {
+            "Samsung Galaxy Tab S8": {"price": 20000, "stock": 6, "features": "10.4-inch Display, Snapdragon Processor"},
+            "Samsung Galaxy Tab A8": {"price": 15000, "stock": 8, "features": "10.5-inch Display, 4GB RAM"},
+            "Samsung Galaxy Tab S7 FE": {"price": 25000, "stock": 5, "features": "12.4-inch Display, 6GB RAM"},
+            "Samsung Galaxy Tab S6 Lite": {"price": 18000, "stock": 7, "features": "10.4-inch Display, S Pen Included"},
+            "Samsung Galaxy Tab Active 3": {"price": 22000, "stock": 4, "features": "8-inch Display, Rugged Design"}
+        },
+        "Lenovo": {
+            "Lenovo Tab P11": {"price": 18000, "stock": 5, "features": "8-inch Display, MediaTek Processor"},
+            "Lenovo Tab M10": {"price": 12000, "stock": 9, "features": "10.1-inch Display, 3GB RAM"},
+            "Lenovo Yoga Tab 13": {"price": 25000, "stock": 3, "features": "13-inch Display, 8GB RAM"},
+            "Lenovo Tab P12": {"price": 22000, "stock": 4, "features": "12.6-inch Display, Snapdragon Processor"},
+            "Lenovo Tab K10": {"price": 10000, "stock": 8, "features": "10.1-inch Display, 4GB RAM"}
+        },
+        "Microsoft": {
+            "Surface Pro 8": {"price": 50000, "stock": 3, "features": "Surface Pro, 12.3-inch Touchscreen"},
+            "Surface Go 3": {"price": 30000, "stock": 6, "features": "10.5-inch Display, Intel Pentium"},
+            "Surface Pro X": {"price": 60000, "stock": 2, "features": "13-inch Display, SQ2 Processor"},
+            "Surface Laptop Go": {"price": 40000, "stock": 4, "features": "12.4-inch Display, Core i5"},
+            "Surface Duo 2": {"price": 70000, "stock": 1, "features": "Dual Screen, Snapdragon 888"}
+        },
+        "Huawei": {
+            "Huawei MatePad Pro": {"price": 22000, "stock": 4, "features": "10-inch Display, 6GB RAM"},
+            "Huawei MatePad 11": {"price": 20000, "stock": 5, "features": "10.95-inch Display, 120Hz Refresh Rate"},
+            "Huawei MatePad T10": {"price": 15000, "stock": 7, "features": "9.7-inch Display, 2GB RAM"},
+            "Huawei MatePad SE": {"price": 12000, "stock": 9, "features": "10.1-inch Display, 3GB RAM"},
+            "Huawei MediaPad M5": {"price": 18000, "stock": 6, "features": "10.8-inch Display, 4GB RAM"}
+        }
+    },
+    "headphones": {
+        "Sony": {
+            "Sony WH-1000XM4": {"price": 3000, "stock": 20, "features": "Noise Cancelling, Wireless"},
+            "Sony WH-CH710N": {"price": 2000, "stock": 15, "features": "Noise Cancelling, Wireless"},
+            "Sony WF-1000XM4": {"price": 5000, "stock": 18, "features": "Noise Cancelling, High-Resolution Audio"},
+            "Sony WH-XB910N": {"price": 2500, "stock": 12, "features": "Extra Bass, Noise Cancelling"},
+            "Sony WI-1000XM2": {"price": 3500, "stock": 10, "features": "Neckband Style, Noise Cancelling"}
+        },
+        "Bose": {
+            "Bose QuietComfort 45": {"price": 15000, "stock": 10, "features": "Premium Sound, Wireless, ANC"},
+            "Bose Noise Cancelling 700": {"price": 18000, "stock": 8, "features": "Noise Cancelling, Voice Assistant"},
+            "Bose SoundSport Free": {"price": 12000, "stock": 12, "features": "Wireless, Sweat Resistant"},
+            "Bose QuietComfort Earbuds": {"price": 16000, "stock": 9, "features": "Noise Cancelling, Wireless"},
+            "Bose Sport Earbuds": {"price": 10000, "stock": 11, "features": "Wireless, Sweat Resistant"}
+        },
+        "JBL": {
+            "JBL Live 660NC": {"price": 5000, "stock": 15, "features": "Bass Boost, Wireless"},
+            "JBL Tune 750BTNC": {"price": 4000, "stock": 18, "features": "Noise Cancelling, Wireless"},
+            "JBL Quantum 800": {"price": 6000, "stock": 10, "features": "Gaming Headset, Wireless"},
+            "JBL Endurance Run": {"price": 2000, "stock": 20, "features": "Sports Earphones, Sweatproof"},
+            "JBL Reflect Flow Pro": {"price": 7000, "stock": 12, "features": "Wireless, Noise Cancelling"}
+        },
+        "Sennheiser": {
+            "Sennheiser HD 450BT": {"price": 12000, "stock": 8, "features": "Hi-Fi Sound, Wireless, ANC"},
+            "Sennheiser Momentum 3": {"price": 15000, "stock": 6, "features": "Premium Sound, Noise Cancelling"},
+            "Sennheiser CX Plus": {"price": 10000, "stock": 10, "features": "True Wireless, Noise Cancelling"},
+            "Sennheiser HD 250BT": {"price": 8000, "stock": 12, "features": "Wireless, 25-Hour Battery"},
+            "Sennheiser IE 300": {"price": 18000, "stock": 4, "features": "High-End Sound, Wired"}
+        },
+        "Beats": {
+            "Beats Studio Buds": {"price": 10000, "stock": 6, "features": "Bass Enhanced, Apple Integration"},
+            "Beats Solo Pro": {"price": 12000, "stock": 8, "features": "Noise Cancelling, Wireless"},
+            "Beats Powerbeats Pro": {"price": 15000, "stock": 5, "features": "Wireless, Sweat Resistant"},
+            "Beats Flex": {"price": 5000, "stock": 15, "features": "Wireless, 12-Hour Battery"},
+            "Beats Fit Pro": {"price": 13000, "stock": 7, "features": "Wireless, Noise Cancelling"}
+        }
+    },
+    "smart TV": {
+        "Samsung": {
+            "Samsung QLED Q80A": {"price": 40000, "stock": 6, "features": "4K UHD, Smart Features"},
+            "Samsung Crystal UHD AU8000": {"price": 35000, "stock": 8, "features": "4K UHD, HDR"},
+            "Samsung The Frame": {"price": 50000, "stock": 4, "features": "4K UHD, Art Mode"},
+            "Samsung Neo QLED QN90A": {"price": 60000, "stock": 3, "features": "4K UHD, Mini-LED"},
+            "Samsung TU7000": {"price": 30000, "stock": 10, "features": "4K UHD, Crystal Processor"}
+        },
+        "LG": {
+            "LG OLED C1": {"price": 38000, "stock": 5, "features": "OLED Display, Dolby Vision"},
+            "LG NanoCell 75": {"price": 35000, "stock": 7, "features": "4K UHD, NanoCell Technology"},
+            "LG UHD UP8000": {"price": 30000, "stock": 9, "features": "4K UHD, AI ThinQ"},
+            "LG OLED G1": {"price": 55000, "stock": 3, "features": "OLED Display, Gallery Design"},
+            "LG QNED MiniLED 99": {"price": 60000, "stock": 2, "features": "4K UHD, Mini-LED"}
+        },
+        "Sony": {
+            "Sony Bravia XR A80J": {"price": 45000, "stock": 4, "features": "HDR, 120Hz Refresh Rate"},
+            "Sony Bravia X90J": {"price": 40000, "stock": 6, "features": "4K UHD, Full Array LED"},
+            "Sony Bravia X85J": {"price": 35000, "stock": 8, "features": "4K UHD, Motionflow XR"},
+            "Sony Bravia A90J": {"price": 70000, "stock": 2, "features": "OLED Display, Cognitive Processor"},
+            "Sony Bravia X95J": {"price": 50000, "stock": 3, "features": "4K UHD, Full Array LED"}
+        },
+        "TCL": {
+            "TCL 6-Series": {"price": 30000, "stock": 7, "features": "QLED, Dolby Atmos"},
+            "TCL 5-Series": {"price": 25000, "stock": 9, "features": "4K UHD, HDR"},
+            "TCL 4-Series": {"price": 20000, "stock": 12, "features": "4K UHD, Roku TV"},
+            "TCL Mini-LED C825": {"price": 40000, "stock": 4, "features": "4K UHD, Mini-LED"},
+            "TCL 8-Series": {"price": 50000, "stock": 3, "features": "8K UHD, QLED"}
+        },
+        "OnePlus": {
+            "OnePlus TV U1S": {"price": 28000, "stock": 5, "features": "4K Android TV, 60Hz Refresh Rate"},
+            "OnePlus TV Y1S": {"price": 20000, "stock": 8, "features": "Full HD, Android TV"},
+            "OnePlus TV U1": {"price": 25000, "stock": 6, "features": "4K UHD, Dolby Vision"},
+            "OnePlus TV 55U1": {"price": 30000, "stock": 4, "features": "4K UHD, HDR10+"},
+            "OnePlus TV 32Y1": {"price": 15000, "stock": 10, "features": "HD Ready, Android TV"}
+        }
+    },
+    "gaming console": {
+        "Sony": {
+            "PlayStation 5": {"price": 35000, "stock": 4, "features": "PlayStation 5, 4K Gaming"},
+            "PlayStation 5 Digital Edition": {"price": 30000, "stock": 3, "features": "PlayStation 5, Digital Only"},
+            "PlayStation 4 Pro": {"price": 25000, "stock": 6, "features": "4K Gaming, 1TB Storage"},
+            "PlayStation 4 Slim": {"price": 20000, "stock": 8, "features": "1080p Gaming, 500GB Storage"},
+            "PlayStation Classic": {"price": 10000, "stock": 10, "features": "Mini Console, 20 Preloaded Games"}
+        },
+        "Microsoft": {
+            "Xbox Series X": {"price": 34000, "stock": 3, "features": "Xbox Series X, 4K Gaming"},
+            "Xbox Series S": {"price": 25000, "stock": 5, "features": "Xbox Series S, 1440p Gaming"},
+            "Xbox One X": {"price": 28000, "stock": 4, "features": "4K Gaming, 1TB Storage"},
+            "Xbox One S": {"price": 20000, "stock": 7, "features": "1080p Gaming, 500GB Storage"},
+            "Xbox 360": {"price": 10000, "stock": 10, "features": "Legacy Console, 250GB Storage"}
+        },
+        "Nintendo": {
+            "Nintendo Switch OLED": {"price": 25000, "stock": 6, "features": "Switch OLED, Portable Gaming"},
+            "Nintendo Switch": {"price": 20000, "stock": 8, "features": "Switch, Portable Gaming"},
+            "Nintendo Switch Lite": {"price": 15000, "stock": 10, "features": "Switch Lite, Handheld Only"},
+            "Nintendo 3DS": {"price": 10000, "stock": 12, "features": "3D Gaming, Dual Screens"},
+            "Nintendo Wii U": {"price": 12000, "stock": 5, "features": "Legacy Console, GamePad Included"}
+        }
+    },
+    "wireless earbuds": {
+        "Apple": {
+            "AirPods Pro": {"price": 2000, "stock": 25, "features": "AirPods, Spatial Audio"},
+            "AirPods 3": {"price": 1500, "stock": 30, "features": "Wireless, Adaptive EQ"},
+            "AirPods Max": {"price": 5000, "stock": 10, "features": "Over-Ear, Noise Cancelling"},
+            "AirPods 2": {"price": 1200, "stock": 35, "features": "Wireless, H1 Chip"},
+            "Beats Fit Pro": {"price": 1800, "stock": 20, "features": "Wireless, Noise Cancelling"}
+        },
+        "JBL": {
+            "JBL Live Pro 2": {"price": 3000, "stock": 20, "features": "Bass Boost, Touch Controls"},
+            "JBL Reflect Flow": {"price": 2500, "stock": 18, "features": "Wireless, Sweatproof"},
+            "JBL Endurance Peak II": {"price": 2000, "stock": 22, "features": "Wireless, 30-Hour Battery"},
+            "JBL Tune 230NC": {"price": 1800, "stock": 25, "features": "Noise Cancelling, Wireless"},
+            "JBL Club Pro Plus": {"price": 3500, "stock": 15, "features": "Wireless, ANC"}
+        },
+        "Sony": {
+            "Sony WF-1000XM4": {"price": 5000, "stock": 18, "features": "Noise Cancelling, High-Resolution Audio"},
+            "Sony WF-C500": {"price": 2000, "stock": 25, "features": "Wireless, 20-Hour Battery"},
+            "Sony WF-SP800N": {"price": 3000, "stock": 20, "features": "Noise Cancelling, Extra Bass"},
+            "Sony WF-XB700": {"price": 2500, "stock": 22, "features": "Wireless, Extra Bass"},
+            "Sony LinkBuds": {"price": 3500, "stock": 15, "features": "Open-Ring Design, Adaptive Volume"}
+        },
+        "Samsung": {
+            "Samsung Galaxy Buds Pro": {"price": 3500, "stock": 15, "features": "Galaxy Buds, ANC"},
+            "Samsung Galaxy Buds 2": {"price": 3000, "stock": 18, "features": "Wireless, Noise Cancelling"},
+            "Samsung Galaxy Buds Live": {"price": 2500, "stock": 20, "features": "Bean Design, ANC"},
+            "Samsung Galaxy Buds Plus": {"price": 2000, "stock": 22, "features": "Wireless, 22-Hour Battery"},
+            "Samsung Gear IconX": {"price": 1500, "stock": 25, "features": "Wireless, Fitness Tracking"}
+        },
+        "Nothing": {
+            "Nothing Ear 1": {"price": 4000, "stock": 12, "features": "Transparent Design, High Bass"},
+            "Nothing Ear Stick": {"price": 3500, "stock": 15, "features": "Semi-In Ear, Wireless"},
+            "Nothing Ear 2": {"price": 4500, "stock": 10, "features": "ANC, Wireless"},
+            "Nothing Ear 1 Black": {"price": 4000, "stock": 12, "features": "Transparent Design, High Bass"},
+            "Nothing Ear 1 White": {"price": 4000, "stock": 12, "features": "Transparent Design, High Bass"}
+        }
+    },
+    "desktop PC": {
+        "HP": {
+            "HP Pavilion Desktop": {"price": 60000, "stock": 7, "features": "16GB RAM, 1TB SSD, i7 Processor"},
+            "HP Envy Desktop": {"price": 80000, "stock": 5, "features": "32GB RAM, 2TB SSD, i9 Processor"},
+            "HP Omen Desktop": {"price": 90000, "stock": 4, "features": "16GB RAM, 1TB SSD, RTX 3060"},
+            "HP EliteDesk": {"price": 70000, "stock": 6, "features": "16GB RAM, 512GB SSD, Business Grade"},
+            "HP Slim Desktop": {"price": 50000, "stock": 8, "features": "8GB RAM, 256GB SSD, i5 Processor"}
+        },
+        "Dell": {
+            "Dell XPS Desktop": {"price": 65000, "stock": 5, "features": "12GB RAM, 512GB SSD, i5 Processor"},
+            "Dell Inspiron Desktop": {"price": 55000, "stock": 7, "features": "8GB RAM, 1TB HDD, i5 Processor"},
+            "Dell Alienware Aurora": {"price": 120000, "stock": 2, "features": "32GB RAM, 2TB SSD, RTX 3080"},
+            "Dell OptiPlex": {"price": 60000, "stock": 6, "features": "16GB RAM, 512GB SSD, Business Grade"},
+            "Dell G5 Gaming Desktop": {"price": 80000, "stock": 4, "features": "16GB RAM, 1TB SSD, RTX 3050"}
+        },
+        "Lenovo": {
+            "Lenovo ThinkCentre": {"price": 55000, "stock": 6, "features": "8GB RAM, 1TB HDD, i5 Processor"},
+            "Lenovo IdeaCentre": {"price": 50000, "stock": 8, "features": "8GB RAM, 512GB SSD, i5 Processor"},
+            "Lenovo Legion Tower": {"price": 90000, "stock": 3, "features": "32GB RAM, 1TB SSD, RTX 3070"},
+            "Lenovo Yoga AIO": {"price": 70000, "stock": 4, "features": "16GB RAM, 512GB SSD, All-in-One"},
+            "Lenovo ThinkStation": {"price": 80000, "stock": 5, "features": "16GB RAM, 1TB SSD, Workstation"}
+        },
+        "Asus": {
+            "Asus ROG Strix": {"price": 70000, "stock": 4, "features": "Gaming PC, 32GB RAM, RTX 3060"},
+            "Asus VivoMini": {"price": 40000, "stock": 8, "features": "8GB RAM, 256GB SSD, Compact Design"},
+            "Asus ExpertCenter": {"price": 60000, "stock": 6, "features": "16GB RAM, 512GB SSD, Business Grade"},
+            "Asus Zen AIO": {"price": 65000, "stock": 5, "features": "16GB RAM, 512GB SSD, All-in-One"},
+            "Asus ProArt Station": {"price": 90000, "stock": 3, "features": "32GB RAM, 1TB SSD, Workstation"}
+        }
+    },
+    "camera": {
+        "Canon": {
+            "Canon EOS R5": {"price": 45000, "stock": 5, "features": "24MP, 4K Video Recording"},
+            "Canon EOS 90D": {"price": 50000, "stock": 4, "features": "32MP, 4K Video Recording"},
+            "Canon EOS M50 Mark II": {"price": 40000, "stock": 6, "features": "24MP, 4K Video, Mirrorless"},
+            "Canon PowerShot G7 X Mark III": {"price": 35000, "stock": 7, "features": "20MP, 4K Video, Compact"},
+            "Canon EOS Rebel T8i": {"price": 30000, "stock": 8, "features": "24MP, 1080p Video, DSLR"}
+        },
+        "Nikon": {
+            "Nikon Z9": {"price": 50000, "stock": 4, "features": "26MP, 4K Video Recording"},
+            "Nikon D850": {"price": 55000, "stock": 3, "features": "45MP, 4K Video, DSLR"},
+            "Nikon Z6 II": {"price": 45000, "stock": 5, "features": "24MP, 4K Video, Mirrorless"},
+            "Nikon D7500": {"price": 40000, "stock": 6, "features": "20MP, 4K Video, DSLR"},
+            "Nikon Coolpix P1000": {"price": 35000, "stock": 7, "features": "16MP, 125x Zoom, 4K Video"}
+        },
+        "Sony": {
+            "Sony Alpha 7 IV": {"price": 60000, "stock": 3, "features": "Mirrorless, 30MP, 4K Video"},
+            "Sony Alpha 7C": {"price": 55000, "stock": 4, "features": "24MP, 4K Video, Compact"},
+            "Sony Alpha 6600": {"price": 50000, "stock": 5, "features": "24MP, 4K Video, Mirrorless"},
+            "Sony RX100 VII": {"price": 45000, "stock": 6, "features": "20MP, 4K Video, Compact"},
+            "Sony ZV-1": {"price": 40000, "stock": 7, "features": "20MP, 4K Video, Vlogging"}
+        },
+        "GoPro": {
+            "GoPro Hero 11": {"price": 25000, "stock": 7, "features": "Action Camera, 5K Video"},
+            "GoPro Hero 10": {"price": 20000, "stock": 9, "features": "Action Camera, 5K Video"},
+            "GoPro Hero 9": {"price": 18000, "stock": 10, "features": "Action Camera, 5K Video"},
+            "GoPro Max": {"price": 30000, "stock": 5, "features": "360-Degree Camera, 5.6K Video"},
+            "GoPro Hero 8": {"price": 15000, "stock": 12, "features": "Action Camera, 4K Video"}
+        }
+    },
+    "printer": {
+        "HP": {
+            "HP LaserJet Pro": {"price": 12000, "stock": 9, "features": "Laser Printer, Wireless"},
+            "HP Envy Photo": {"price": 10000, "stock": 10, "features": "Inkjet, Photo Printing"},
+            "HP OfficeJet Pro": {"price": 15000, "stock": 7, "features": "Inkjet, Duplex Printing"},
+            "HP DeskJet Plus": {"price": 8000, "stock": 12, "features": "Inkjet, Wireless"},
+            "HP Color LaserJet": {"price": 20000, "stock": 5, "features": "Color Laser, Wireless"}
+        },
+        "Canon": {
+            "Canon PIXMA G": {"price": 11000, "stock": 8, "features": "Inkjet, Duplex Printing"},
+            "Canon imageCLASS": {"price": 13000, "stock": 7, "features": "Laser Printer, Wireless"},
+            "Canon SELPHY": {"price": 9000, "stock": 10, "features": "Photo Printer, Compact"},
+            "Canon MAXIFY": {"price": 14000, "stock": 6, "features": "Inkjet, High Yield"},
+            "Canon PIXMA Pro": {"price": 16000, "stock": 4, "features": "Photo Printer, Professional"}
+        },
+        "Epson": {
+            "Epson EcoTank": {"price": 15000, "stock": 6, "features": "EcoTank, High Yield Printing"},
+            "Epson SureColor": {"price": 20000, "stock": 4, "features": "Wide Format, Photo Printing"},
+            "Epson WorkForce": {"price": 12000, "stock": 8, "features": "Inkjet, Wireless"},
+            "Epson Expression": {"price": 10000, "stock": 10, "features": "Inkjet, Compact"},
+            "Epson L Series": {"price": 13000, "stock": 7, "features": "EcoTank, High Yield"}
+        }
+    },
+    "router": {
+        "TP-Link": {
+            "TP-Link Archer C7": {"price": 2500, "stock": 12, "features": "Dual Band, Gigabit Speed"},
+            "TP-Link Deco M5": {"price": 3000, "stock": 10, "features": "Mesh System, Whole Home Coverage"},
+            "TP-Link Archer AX50": {"price": 4000, "stock": 8, "features": "Wi-Fi 6, Dual Band"},
+            "TP-Link TL-WR840N": {"price": 1500, "stock": 15, "features": "300Mbps, Wireless N"},
+            "TP-Link Archer A7": {"price": 2000, "stock": 12, "features": "Dual Band, Gigabit Speed"}
+        },
+        "Netgear": {
+            "Netgear Nighthawk R7000": {"price": 4000, "stock": 10, "features": "Tri-Band, Mesh System"},
+            "Netgear Orbi RBK50": {"price": 5000, "stock": 8, "features": "Mesh System, Whole Home Coverage"},
+            "Netgear Nighthawk AX8": {"price": 6000, "stock": 6, "features": "Wi-Fi 6, 8-Stream"},
+            "Netgear R6700": {"price": 3000, "stock": 12, "features": "Dual Band, Gigabit Speed"},
+            "Netgear Nighthawk X6": {"price": 4500, "stock": 9, "features": "Tri-Band, High Speed"}
+        },
+        "Asus": {
+            "Asus RT-AX88U": {"price": 5000, "stock": 8, "features": "Wi-Fi 6, Gaming Router"},
+            "Asus RT-AC86U": {"price": 4000, "stock": 10, "features": "Dual Band, Gaming Router"},
+            "Asus ROG Rapture GT-AX11000": {"price": 7000, "stock": 5, "features": "Tri-Band, Gaming Router"},
+            "Asus RT-AC68U": {"price": 3500, "stock": 12, "features": "Dual Band, Gigabit Speed"},
+            "Asus ZenWiFi AX": {"price": 6000, "stock": 7, "features": "Mesh System, Wi-Fi 6"}
+        }
+    },
+    "power bank": {
+        "Mi": {
+            "Mi Power Bank 3i": {"price": 1500, "stock": 18, "features": "10000mAh, Fast Charging"},
+            "Mi Power Bank Pro": {"price": 2000, "stock": 15, "features": "20000mAh, USB-C PD"},
+            "Mi Power Bank 2i": {"price": 1200, "stock": 20, "features": "10000mAh, Dual Output"},
+            "Mi Power Bank 10000mAh": {"price": 1000, "stock": 25, "features": "10000mAh, Compact Design"},
+            "Mi Power Bank 20000mAh": {"price": 2500, "stock": 12, "features": "20000mAh, Fast Charging"}
+        },
+        "Anker": {
+            "Anker PowerCore 10000": {"price": 3000, "stock": 15, "features": "20000mAh, USB-C PD"},
+            "Anker PowerCore 20000": {"price": 3500, "stock": 12, "features": "20000mAh, High Capacity"},
+            "Anker PowerCore Slim": {"price": 2500, "stock": 18, "features": "10000mAh, Slim Design"},
+            "Anker PowerCore Essential": {"price": 2000, "stock": 20, "features": "20000mAh, Dual Output"},
+            "Anker PowerCore III": {"price": 4000, "stock": 10, "features": "20000mAh, USB-C PD"}
+        },
+        "Realme": {
+            "Realme Power Bank 10000mAh": {"price": 2000, "stock": 12, "features": "10000mAh, Quick Charge"},
+            "Realme Power Bank 20000mAh": {"price": 2500, "stock": 10, "features": "20000mAh, Fast Charging"},
+            "Realme Power Bank 2i": {"price": 1500, "stock": 15, "features": "10000mAh, Dual Output"},
+            "Realme Power Bank Pro": {"price": 3000, "stock": 8, "features": "20000mAh, USB-C PD"},
+            "Realme Power Bank Slim": {"price": 1800, "stock": 12, "features": "10000mAh, Compact Design"}
+        }
+    },
+    "external hard drive": {
+        "Seagate": {
+            "Seagate Backup Plus": {"price": 5000, "stock": 10, "features": "1TB, USB 3.0"},
+            "Seagate Expansion": {"price": 6000, "stock": 8, "features": "2TB, USB 3.0"},
+            "Seagate One Touch": {"price": 7000, "stock": 6, "features": "1TB, USB-C Support"},
+            "Seagate Portable Drive": {"price": 5500, "stock": 9, "features": "1TB, USB 3.0"},
+            "Seagate FireCuda": {"price": 8000, "stock": 5, "features": "1TB SSD, High-Speed Transfer"}
+        },
+        "WD": {
+            "WD My Passport": {"price": 5500, "stock": 8, "features": "2TB, USB-C Support"},
+            "WD Elements": {"price": 6000, "stock": 7, "features": "1TB, USB 3.0"},
+            "WD My Book": {"price": 7000, "stock": 5, "features": "4TB, USB 3.0"},
+            "WD Black P10": {"price": 6500, "stock": 6, "features": "2TB, USB 3.0"},
+            "WD Blue SSD": {"price": 9000, "stock": 4, "features": "1TB SSD, High-Speed Transfer"}
+        },
+        "Samsung": {
+            "Samsung T7": {"price": 7000, "stock": 5, "features": "1TB SSD, High-Speed Transfer"},
+            "Samsung T5": {"price": 6000, "stock": 7, "features": "1TB SSD, USB 3.0"},
+            "Samsung T7 Touch": {"price": 8000, "stock": 4, "features": "1TB SSD, Fingerprint Security"},
+            "Samsung Portable SSD": {"price": 5500, "stock": 8, "features": "1TB SSD, USB 3.0"},
+            "Samsung X5": {"price": 10000, "stock": 3, "features": "1TB SSD, Thunderbolt 3"}
+        }
+    },
+    "VR headset": {
+        "Oculus": {
+            "Oculus Quest 2": {"price": 30000, "stock": 3, "features": "Standalone, High Refresh Rate"},
+            "Oculus Rift S": {"price": 25000, "stock": 5, "features": "PC VR, High-Resolution Display"},
+            "Oculus Go": {"price": 15000, "stock": 7, "features": "Standalone, Affordable"},
+            "Oculus Quest Pro": {"price": 40000, "stock": 2, "features": "Standalone, Advanced Tracking"},
+            "Oculus Quest 3": {"price": 35000, "stock": 3, "features": "Standalone, High Refresh Rate"}
+        },
+        "HTC": {
+            "HTC Vive Pro": {"price": 35000, "stock": 2, "features": "PC VR, High-Resolution Display"},
+            "HTC Vive Cosmos": {"price": 30000, "stock": 4, "features": "PC VR, Modular Design"},
+            "HTC Vive Focus 3": {"price": 40000, "stock": 3, "features": "Standalone, High-Resolution Display"},
+            "HTC Vive Flow": {"price": 25000, "stock": 5, "features": "Standalone, Lightweight"},
+            "HTC Vive Pro 2": {"price": 45000, "stock": 2, "features": "PC VR, High-Resolution Display"}
+        },
+        "Sony": {
+            "Sony PlayStation VR2": {"price": 40000, "stock": 3, "features": "PlayStation VR2, Immersive Gaming"},
+            "Sony PlayStation VR": {"price": 25000, "stock": 5, "features": "PlayStation VR, 1080p Display"},
+            "Sony HMZ-T3W": {"price": 30000, "stock": 4, "features": "Personal 3D Viewer, OLED Display"},
+            "Sony VR Headset": {"price": 35000, "stock": 3, "features": "High-Resolution Display, Immersive"},
+            "Sony PlayStation VR2 Pro": {"price": 45000, "stock": 2, "features": "PlayStation VR2, Advanced Tracking"}
+        }
+    }
+}
+    return default_products
+
+# Load or initialize data
+users = load_data(app.config['USER_DATA_FILE'])
+wishlist = load_data(app.config['WISHLIST_FILE'])
+orders = load_data(app.config['ORDERS_FILE'])
+reviews = load_data(app.config['REVIEWS_FILE'])
+products = load_data(app.config['PRODUCTS_FILE'])
+
+if not products:
+    products = initialize_default_products()
+    save_data(app.config['PRODUCTS_FILE'], products)
+
+# Decorators
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session or users.get(session['username'], {}).get('role') != 'admin':
+            flash('Admin access required.', 'danger')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Routes
+@app.route('/')
+def home():
+    category = request.args.get('category', '')
+    brand = request.args.get('brand', '')
+    min_price = request.args.get('min_price', type=int, default=0)
+    max_price = request.args.get('max_price', type=int, default=float('inf'))
+
+    filtered_products = []
+    for cat, brands in products.items():
+        if category and cat != category:
+            continue
+        for br, models in brands.items():
+            if brand and br != brand:
+                continue
+            for model, details in models.items():
+                if min_price <= details['price'] <= max_price:
+                    filtered_products.append({
+                        'category': cat,
+                        'brand': br,
+                        'model': model,
+                        'price': details['price'],
+                        'image': details.get('image', 'default_product.jpg'),
+                        'features': details['features']
+                    })
+
+    return render_template('home.html', products=products, filtered_products=filtered_products)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        
+        if username in users and check_password_hash(users[username]['password'], password):
+            session['username'] = username
+            flash('Login successful!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
+        else:
+            flash('Invalid username or password. Please try again.', 'danger')
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        confirm_password = request.form['confirm_password'].strip()
+        email = request.form['email'].strip()
+        
+        if username in users:
+            flash('Username already exists. Please choose another.', 'danger')
+        elif password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+        else:
+            users[username] = {
+                'password': generate_password_hash(password),
+                'email': email,
+                'name': request.form.get('name', ''),
+                'address': request.form.get('address', ''),
+                'joined': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'role': 'user'
+            }
+            save_data(app.config['USER_DATA_FILE'], users)
+            flash('Signup successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+    
+    return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('home'))
+
+@app.route('/products')
+def all_products():
+    return render_template('products.html', categories=products)
+
+@app.route('/products/<category>')
+def category_products(category):
+    if category in products:
+        return render_template('category.html', 
+                            category=category.capitalize(), 
+                            brands=products[category])
+    flash('Category not found.', 'danger')
+    return redirect(url_for('all_products'))
+
+@app.route('/products/<category>/<brand>')
+def brand_products(category, brand):
+    if category in products and brand in products[category]:
+        return render_template('brand.html', 
+                            category=category.capitalize(),
+                            brand=brand.capitalize(),
+                            models=products[category][brand])
+    flash('Brand not found in this category.', 'danger')
+    return redirect(url_for('category_products', category=category, brand=brand))
+
+@app.route('/product/<category>/<brand>/<model>')
+def product_detail(category, brand, model):
+    if (category in products and 
+        brand in products[category] and 
+        model in products[category][brand]):
+        
+        product = products[category][brand][model]
+        product_reviews = reviews.get(category, {}).get(brand, {}).get(model, [])
+        
+        avg_rating = 0
+        if product_reviews:
+            avg_rating = sum(review['rating'] for review in product_reviews) / len(product_reviews)
+        
+        return render_template('product_detail.html',
+                            category=category,
+                            brand=brand,
+                            model=model,
+                            product=product,
+                            reviews=product_reviews,
+                            avg_rating=round(avg_rating, 1))
+    
+    flash('Product not found.', 'danger')
+    return redirect(url_for('brand_products', category=category, brand=brand))
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '').strip().lower()
+    results = []
+    
+    if query:
+        for category, brands in products.items():
+            for brand, models in brands.items():
+                for model, details in models.items():
+                    if (query in category.lower() or
+                        query in brand.lower() or
+                        query in model.lower() or
+                        query in details['features'].lower()):
+                        results.append({
+                            'category': category,
+                            'brand': brand,
+                            'model': model,
+                            'price': details['price'],
+                            'features': details['features'],
+                            'image': details.get('image', 'default_product.jpg')
+                        })
+    
+    return render_template('search_results.html', 
+                         query=query, 
+                         results=results,
+                         results_count=len(results))
+
+@app.route('/cart')
+@login_required
+def view_cart():
+    cart = session.get('cart', {})
+    cart_items = []
+    total = 0
+    
+    for key, item in cart.items():
+        cart_items.append(item)
+        total += item['quantity'] * item['price']
+    
+    return render_template('cart.html', cart_items=cart_items, total=total)
+
+@app.route('/cart/add', methods=['POST'])
+@login_required
+def add_to_cart():
+    try:
+        category = request.form.get('category', '').strip()
+        brand = request.form.get('brand', '').strip()
+        model = request.form.get('model', '').strip()
+        quantity = int(request.form.get('quantity', 1))
+
+        if not category or not brand or not model:
+            flash('Invalid product details. Please try again.', 'danger')
+            return redirect(request.referrer or url_for('products'))
+
+        product = products.get(category, {}).get(brand, {}).get(model)
+        if not product:
+            flash('Product not found.', 'danger')
+            return redirect(request.referrer or url_for('products'))
+
+        cart = session.get('cart', {})
+        key = f"{category}|{brand}|{model}"
+        if key in cart:
+            cart[key]['quantity'] += quantity
+        else:
+            cart[key] = {
+                'category': category,
+                'brand': brand,
+                'model': model,
+                'quantity': quantity,
+                'price': product['price'],
+                'image': product.get('image', 'placeholder-product.png')
+            }
+        session['cart'] = cart
+        session.modified = True
+
+        flash(f'{model} added to cart!', 'success')
+        return redirect(request.referrer or url_for('products'))
+
+    except KeyError as e:
+        app.logger.error(f"KeyError: {e}")
+        flash('An error occurred while processing your request. Please try again.', 'danger')
+        return redirect(request.referrer or url_for('products'))
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error: {e}")
+        flash('An unexpected error occurred. Please try again.', 'danger')
+        return redirect(request.referrer or url_for('products'))
+
+@app.route('/cart/update', methods=['POST'])
+@login_required
+def update_cart():
+    key = request.form['item_key']
+    new_quantity = int(request.form['quantity'])
+    
+    if new_quantity <= 0:
+        return remove_from_cart()
+    
+    if 'cart' in session and key in session['cart']:
+        category, brand, model = key.split('|')
+        product = products[category][brand][model]
+        
+        if new_quantity > product['stock']:
+            flash(f'Only {product["stock"]} units available.', 'warning')
+            return redirect(url_for('view_cart'))
+        
+        session['cart'][key]['quantity'] = new_quantity
+        session.modified = True
+        flash('Cart updated!', 'success')
+    
+    return redirect(url_for('view_cart'))
+
+@app.route('/cart/remove', methods=['POST'])
+@login_required
+def remove_from_cart():
+    key = request.form['item_key']
+    
+    if 'cart' in session and key in session['cart']:
+        del session['cart'][key]
+        session.modified = True
+        flash('Item removed from cart.', 'success')
+    
+    return redirect(url_for('view_cart'))
+
+@app.route('/cart/clear')
+@login_required
+def clear_cart():
+    if 'cart' in session:
+        session.pop('cart')
+        flash('Cart cleared.', 'info')
+    return redirect(url_for('view_cart'))
+
+@app.route('/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    if 'cart' not in session or not session['cart']:
+        flash('Your cart is empty.', 'warning')
+        return redirect(url_for('view_cart'))
+    
+    if request.method == 'POST':
+        username = session['username']
+        cart_items = session['cart']
+        total = sum(item['quantity'] * item['price'] for item in cart_items.values())
+        
+        order = {
+            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'items': [],
+            'total': total,
+            'shipping': request.form['shipping_address'],
+            'payment': request.form['payment_method'],
+            'status': 'processing'
+        }
+        
+        for key, item in cart_items.items():
+            category, brand, model = key.split('|')
+            products[category][brand][model]['stock'] -= item['quantity']
+            
+            order['items'].append({
+                'category': category,
+                'brand': brand,
+                'model': model,
+                'quantity': item['quantity'],
+                'price': item['price']
+            })
+        
+        save_data(app.config['PRODUCTS_FILE'], products)
+        
+        if username not in orders:
+            orders[username] = []
+        orders[username].append(order)
+        save_data(app.config['ORDERS_FILE'], orders)
+        
+        session.pop('cart', None)
+        
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('order_confirmation'))
+    
+    total = sum(item['quantity'] * item['price'] for item in session['cart'].values())
+    
+    return render_template('checkout.html', total=total)
+
+@app.route('/order/confirmation')
+@login_required
+def order_confirmation():
+    username = session['username']
+    if username in orders and orders[username]:
+        latest_order = orders[username][-1]
+        return render_template('order_confirmation.html', order=latest_order)
+    
+    flash('No recent orders found.', 'warning')
+    return redirect(url_for('home'))
+
+@app.route('/orders')
+@login_required
+def order_history():
+    username = session['username']
+    user_orders = orders.get(username, [])
+    return render_template('order_history.html', orders=user_orders[::-1])
+
+@app.route('/wishlist')
+@login_required
+def view_wishlist():
+    username = session['username']
+    user_wishlist = wishlist.get(username, [])
+    
+    wishlist_items = []
+    for item in user_wishlist:
+        category = item['category']
+        brand = item['brand']
+        model = item['model']
+        
+        if category in products and brand in products[category] and model in products[category][brand]:
+            product = products[category][brand][model]
+            wishlist_items.append({
+                'category': category,
+                'brand': brand,
+                'model': model,
+                'price': product['price'],
+                'features': product['features'],
+                'image': product.get('image', 'default_product.jpg')
+            })
+    
+    return render_template('wishlist.html', wishlist=wishlist_items)
+
+@app.route('/wishlist/add', methods=['POST'])
+@login_required
+def add_to_wishlist():
+    username = session['username']
+    category = request.form['category']
+    brand = request.form['brand']
+    model = request.form['model']
+    
+    if username not in wishlist:
+        wishlist[username] = []
+    
+    if not any(item for item in wishlist[username] if 
+               item['category'] == category and 
+               item['brand'] == brand and 
+               item['model'] == model):
+        
+        wishlist[username].append({
+            'category': category,
+            'brand': brand,
+            'model': model
+        })
+        save_data(app.config['WISHLIST_FILE'], wishlist)
+        flash('Added to wishlist!', 'success')
+    else:
+        flash('Already in your wishlist.', 'info')
+    
+    return redirect(request.referrer or url_for('home'))
+
+@app.route('/wishlist/remove', methods=['POST'])
+@login_required
+def remove_from_wishlist():
+    username = session['username']
+    category = request.form['category']
+    brand = request.form['brand']
+    model = request.form['model']
+    
+    if username in wishlist:
+        wishlist[username] = [item for item in wishlist[username] if not (
+            item['category'] == category and 
+            item['brand'] == brand and 
+            item['model'] == model
+        )]
+        save_data(app.config['WISHLIST_FILE'], wishlist)
+        flash('Removed from wishlist.', 'success')
+    
+    return redirect(url_for('view_wishlist'))
+
+@app.route('/review/add', methods=['POST'])
+@login_required
+def add_review():
+    username = session['username']
+    category = request.form['category']
+    brand = request.form['brand']
+    model = request.form['model']
+    rating = int(request.form['rating'])
+    comment = request.form['comment'].strip()
+    
+    if not (1 <= rating <= 5):
+        flash('Rating must be between 1 and 5.', 'danger')
+        return redirect(url_for('product_detail', category=category, brand=brand, model=model))
+    
+    if not comment:
+        flash('Please enter a review comment.', 'danger')
+        return redirect(url_for('product_detail', category=category, brand=brand, model=model))
+    
+    if category not in reviews:
+        reviews[category] = {}
+    if brand not in reviews[category]:
+        reviews[category][brand] = {}
+    if model not in reviews[category][brand]:
+        reviews[category][brand][model] = []
+    
+    reviews[category][brand][model].append({
+        'username': username,
+        'rating': rating,
+        'comment': comment,
+        'date': datetime.now().strftime('%Y-%m-%d')
+    })
+    
+    save_data(app.config['REVIEWS_FILE'], reviews)
+    flash('Thank you for your review!', 'success')
+    return redirect(url_for('product_detail', category=category, brand=brand, model=model))
+
+@app.route('/profile')
+@login_required
+def profile():
+    username = session['username']
+    user_data = users.get(username, {})
+    order_count = len(orders.get(username, []))
+    wishlist_count = len(wishlist.get(username, []))
+    
+    return render_template('profile.html', 
+                         user=user_data,
+                         order_count=order_count,
+                         wishlist_count=wishlist_count)
+
+@app.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    username = session['username']
+    name = request.form['name'].strip()
+    email = request.form['email'].strip()
+    address = request.form['address'].strip()
+    
+    if username in users:
+        users[username]['name'] = name
+        users[username]['email'] = email
+        users[username]['address'] = address
+        save_data(app.config['USER_DATA_FILE'], users)
+        flash('Profile updated successfully!', 'success')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/profile/change-password', methods=['POST'])
+@login_required
+def change_password():
+    username = session['username']
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+    
+    if username in users:
+        if check_password_hash(users[username]['password'], current_password):
+            if new_password == confirm_password:
+                users[username]['password'] = generate_password_hash(new_password)
+                save_data(app.config['USER_DATA_FILE'], users)
+                flash('Password changed successfully!', 'success')
+            else:
+                flash('New passwords do not match.', 'danger')
+        else:
+            flash('Current password is incorrect.', 'danger')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    user_count = len(users)
+    product_count = sum(len(brands) for category in products.values() for brands in category.values())
+    order_count = sum(len(user_orders) for user_orders in orders.values())
+    
+    recent_orders = []
+    for username, user_orders in orders.items():
+        for order in user_orders[-5:]:
+            recent_orders.append({
+                'username': username,
+                'date': order['date'],
+                'total': order['total'],
+                'status': order['status']
+            })
+    
+    recent_orders.sort(key=lambda x: x['date'], reverse=True)
+    
+    return render_template('admin/dashboard.html',
+                         user_count=user_count,
+                         product_count=product_count,
+                         order_count=order_count,
+                         recent_orders=recent_orders[:10])
+
+@app.route('/api/cart/count')
+def cart_count():
+    count = len(session.get('cart', {}))
+    return jsonify({'count': count})
+
+@app.route('/api/product/stock', methods=['POST'])
+def check_stock():
+    data = request.get_json()
+    category = data['category']
+    brand = data['brand']
+    model = data['model']
+    
+    if (category in products and 
+        brand in products[category] and 
+        model in products[category][brand]):
+        stock = products[category][brand][model]['stock']
+        return jsonify({'stock': stock})
+    
+    return jsonify({'error': 'Product not found'}), 404
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
