@@ -23,7 +23,7 @@
 [HOMEPAGE](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png)
 
 ### 🧑‍💼 Seller Dashboard  
-[SELLER DASHBOARD]([assets/seller_dashboard.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184320.png))
+[SELLER DASHBOARD](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184320.png)
 
 ### 🏠 Login view 
 [LOGIN VIEW](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184216.png)
