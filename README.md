@@ -23,7 +23,7 @@
 ![Homepage](ar_electronics/assets/Screenshot 2025-06-02 184057.png)
 
 ### 🏠 Login view 
-![Login view](ar_electronics/assets/Screenshot 2025-06-02 184057.png)
+![Login view](ar_electronics/assets/Screenshot 2025-06-02 184216.png)
 
 ### 🏠 Products View 
 ![Products View](assets/homepage.png)
