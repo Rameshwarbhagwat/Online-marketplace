@@ -20,14 +20,13 @@
 ## 📸 Screenshots
 
 ### 🏠 Homepage  
-([![Screenshot 2025-06-02 184057](https://github.com/user-attachments/assets/13e42a9a-c69f-4104-91d9-0676ca3bfb88)
-g](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png))
+([ar_electronics/assets/Screenshot 2025-06-02 184246.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png))
 
 ### 🏠 Login view 
 ([ar_electronics/assets/Screenshot 2025-06-02 184216.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184216.png))
 
 ### 🏠 Products View 
-![Products View](ar_electronics/assets/Screenshot 2025-06-02 184246.png)
+([ar_electronics/assets/Screenshot 2025-06-02 184246.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184057.png))
 
 ### 🛒 Wishlist View 
 ![Wishlist View](ar_electronics/assets/Screenshot 2025-06-02 184340.png)
