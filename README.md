@@ -26,7 +26,7 @@
 ![Login view](ar_electronics/assets/Screenshot 2025-06-02 184216.png)
 
 ### 🏠 Products View 
-![Products View](assets/homepage.png)
+![Products View](ar_electronics/assets/Screenshot 2025-06-02 184246.png)
 
 ### 🛒 Wishlist View 
 ![Wishlist View](assets/cart_view.png)
