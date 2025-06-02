@@ -24,7 +24,7 @@
 g)
 
 ### 🏠 Login view 
-![Login view](ar_electronics/assets/Screenshot 2025-06-02 184216.png)
+([ar_electronics/assets/Screenshot 2025-06-02 184216.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184216.png))
 
 ### 🏠 Products View 
 ![Products View](ar_electronics/assets/Screenshot 2025-06-02 184246.png)
