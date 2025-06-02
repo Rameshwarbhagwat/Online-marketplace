@@ -20,7 +20,7 @@
 ## 📸 Screenshots
 
 ### 🏠 Homepage  
-![Homepage](![Screenshot 2025-06-02 184057](https://github.com/user-attachments/assets/13e42a9a-c69f-4104-91d9-0676ca3bfb88)
+(![Screenshot 2025-06-02 184057](https://github.com/user-attachments/assets/13e42a9a-c69f-4104-91d9-0676ca3bfb88)
 g)
 
 ### 🏠 Login view 
