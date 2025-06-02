@@ -32,7 +32,7 @@
 ![Wishlist View]([ar_electronics/assets/Screenshot 2025-06-02 184340.png](https://github.com/Rameshwarbhagwat/Online-marketplace/blob/main/ar_electronics/assets/Screenshot%202025-06-02%20184340.png))
 
 ### 🧑‍💼 Seller Dashboard  
-![Seller Dashboard](ar_electronics/assets/Screenshot 2025-06-02 184320.png)
+![Homepage Screenshot](assets/homepage.png)
 
 > All images are stored in the `assets/` folder. Replace filenames as per your actual files.
 
