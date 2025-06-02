@@ -1,6 +1,6 @@
-# 🛒 LocalMart – Empowering Local Businesses Online
+# 🛒 Online Marketplace – Empowering Local Businesses Online
 
-**LocalMart** is a feature-rich online marketplace built using **Flask (Python)**, designed to empower local businesses with a digital storefront. It connects local sellers with customers through a user-friendly web interface and provides essential tools for managing products, carts, discounts, and purchases.
+**Online Marketplace** is a feature-rich online marketplace built using **Flask (Python)**, designed to empower local businesses with a digital storefront. It connects local sellers with customers through a user-friendly web interface and provides essential tools for managing products, carts, discounts, and purchases.
 
 ---
 
