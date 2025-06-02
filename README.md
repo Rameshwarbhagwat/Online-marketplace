@@ -20,7 +20,7 @@
 ## 📸 Screenshots
 
 ### 🏠 Homepage  
-![Homepage](assets/Screenshot 2025-06-02 184057.png)
+![Homepage](ar_electronics/assets/Screenshot 2025-06-02 184057.png)
 
 ### 🏠 Login view 
 ![Login view](assets/homepage.png)
