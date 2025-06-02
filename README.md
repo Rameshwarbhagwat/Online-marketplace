@@ -32,7 +32,7 @@
 ![Wishlist View](ar_electronics/assets/Screenshot 2025-06-02 184340.png)
 
 ### 🧑‍💼 Seller Dashboard  
-![Seller Dashboard](assets/seller_dashboard.png)
+![Seller Dashboard](ar_electronics/assets/Screenshot 2025-06-02 184320.png)
 
 > All images are stored in the `assets/` folder. Replace filenames as per your actual files.
 
@@ -53,11 +53,12 @@
 ## 📁 Project Structure
 
 ```bash
-LocalMart/
+ar_electronics/
 ├── static/               # CSS, JS, Images
 ├── templates/            # HTML templates (Jinja2)
 ├── app.py                # Main Flask application           
 ├── data/                 # json file
 ├── assets/               # Screenshots for README
 ├── README.md
+├── work.txt
 └── instance              # database
