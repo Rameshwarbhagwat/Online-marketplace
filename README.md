@@ -29,7 +29,7 @@
 ![Products View](ar_electronics/assets/Screenshot 2025-06-02 184246.png)
 
 ### 🛒 Wishlist View 
-![Wishlist View](assets/cart_view.png)
+![Wishlist View](ar_electronics/assets/Screenshot 2025-06-02 184340.png)
 
 ### 🧑‍💼 Seller Dashboard  
 ![Seller Dashboard](assets/seller_dashboard.png)
